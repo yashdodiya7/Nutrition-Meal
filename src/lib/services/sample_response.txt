@@ -1,0 +1,25 @@
+<dishes>
+<dish_name>Vegetarian Breakfast: Avocado and Egg on Gluten-Free Bread</dish_name>
+<dish_ingredients>1 slice of gluten-free whole grain bread, 1/2 avocado, 1 egg, salt, pepper, 1 tomato (sliced), 1 handful of spinach</dish_ingredients>
+<dish_instructions>1. Toast the gluten-free bread until golden brown. 2. Mash the avocado and spread it on the toast. 3. Fry or poach the egg to your liking. 4. Place the egg on top of the avocado. 5. Add sliced tomatoes and a handful of spinach on the side. 6. Season with salt and pepper to taste.</dish_instructions>
+<dish_nutritional_information><protine>14g</protine> <carbs>20g</carbs> <fat>18g</fat> <calories>220kcal</calories></dish_nutritional_information>
+<dish_estimated_cooking_time>15 minutes</dish_estimated_cooking_time>
+
+<dish_name>Vegetarian Lunch: Vegetable Stir-Fry with Quinoa</dish_name>
+<dish_ingredients>100g quinoa, 2 cups water, 1 zucchini, 1 bell pepper, 1 carrot, 1 tablespoon olive oil, 1 clove garlic, 1 tablespoon soy sauce (gluten-free), salt, pepper</dish_ingredients>
+<dish_instructions>1. Rinse the quinoa and cook it in 2 cups of water for 15-20 minutes until soft. 2. Slice the zucchini, bell pepper, and carrot into thin strips. 3. Heat olive oil in a pan and sauté the garlic. 4. Add the vegetables and stir-fry for 10-12 minutes. 5. Season with gluten-free soy sauce, salt, and pepper. 6. Serve the vegetables over the quinoa.</dish_instructions>
+<dish_nutritional_information><protine>8g</protine> <carbs>30g</carbs> <fat>10g</fat> <calories>200kcal</calories></dish_nutritional_information>
+<dish_estimated_cooking_time>30 minutes</dish_estimated_cooking_time>
+
+<dish_name>Vegetarian Dinner: Lentil and Vegetable Stew</dish_name>
+<dish_ingredients>150g red lentils, 1 onion, 2 cloves garlic, 1 carrot, 1 potato, 1 parsnip, 2 cups gluten-free vegetable broth, 1 can diced tomatoes, 1 teaspoon cumin, 1 teaspoon paprika, salt, pepper</dish_ingredients>
+<dish_instructions>1. Rinse the lentils and set aside. 2. Chop the onion, garlic, carrot, potato, and parsnip. 3. In a large pot, sauté the onion and garlic in a little water. 4. Add the chopped vegetables and cook for 5 minutes. 5. Add the lentils, vegetable broth, diced tomatoes, cumin, paprika, salt, and pepper. 6. Bring to a boil, then simmer for 25-30 minutes until the vegetables and lentils are tender. 7. Serve hot.</dish_instructions>
+<dish_nutritional_information><protine>15g</protine> <carbs>40g</carbs> <fat>8g</fat> <calories>250kcal</calories></dish_nutritional_information>
+<dish_estimated_cooking_time>40 minutes</dish_estimated_cooking_time>
+
+<dish_name>Snack: Apple Slices with Almond Butter</dish_name>
+<dish_ingredients>1 medium apple, 2 tablespoons almond butter</dish_ingredients>
+<dish_instructions>1. Wash and slice the apple into thin pieces. 2. Serve with almond butter on the side for dipping.</dish_instructions>
+<dish_nutritional_information><protine>4g</protine> <carbs>15g</carbs> <fat>8g</fat> <calories>120kcal</calories></dish_nutritional_information>
+<dish_estimated_cooking_time>5 minutes</dish_estimated_cooking_time>
+</dishes>
