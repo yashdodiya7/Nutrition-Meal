@@ -21,9 +21,9 @@ export type I18n = {
     dietType: string;
     dietTypePlaceholder: string;
     dietTypeOptions: string[];
-    nutritional: string;
-    nutritionalPlaceholder: string;
-    nutritionalOptions: string[];
+    goal: string;
+    goalPlaceholder: string;
+    goalOptions: string[];
     mealType: string;
     mealTypePlaceholder: string;
     mealTypeOptions: string[];
@@ -31,7 +31,8 @@ export type I18n = {
     quickRecipes: string;
     quickRecipesSub: string;
     restrictionsTitle: string;
-    restrictions: string[];
+    restrictionsPlaceholder: string;
+    restrictionsHelp: string;
     submit: string;
     loading: string;
     requiredError: string;
@@ -41,6 +42,19 @@ export type I18n = {
     generatingTitle: string;
     generatingSub: string;
     tokensUsed: string; // e.g. "tokens used"
+  };
+  fridge: {
+    title: string;
+    instructions: string;
+    addItem: string;
+    emptyTitle: string;
+    emptyDesc: string;
+    name: string;
+    namePlaceholder: string;
+    quantity: string;
+    unit: string;
+    cancel: string;
+    add: string;
   };
 };
 
@@ -60,15 +74,21 @@ const en: I18n = {
     languageGerman: "Deutsch",
   },
   form: {
-    plan: "Plan",
-    planPlaceholder: "Select your plan",
+    plan: "Meal Plan Type",
+    planPlaceholder: "Choose your meal plan type",
     planOptions: ["1 Dish", "1 Day Plan"],
     dietType: "Diet Type",
-    dietTypePlaceholder: "Choose diet type",
+    dietTypePlaceholder: "Choose your diet preference",
     dietTypeOptions: ["Vegan", "Vegetarian", "Normal"],
-    nutritional: "Nutritional Value",
-    nutritionalPlaceholder: "Choose nutritional value",
-    nutritionalOptions: ["High Nutrients", "Low Nutrients"],
+    goal: "Health Goal",
+    goalPlaceholder: "Select your health goal",
+    goalOptions: [
+      "Weight Loss",
+      "Weight Gain",
+      "Muscle Building",
+      "General Health",
+      "Athletic Performance",
+    ],
     mealType: "Meal Type",
     mealTypePlaceholder: "Choose meal type",
     mealTypeOptions: ["Breakfast", "Lunch", "Dinner"],
@@ -76,13 +96,10 @@ const en: I18n = {
     quickRecipes: "Quick Recipes",
     quickRecipesSub: "20 minutes or less",
     restrictionsTitle: "Dietary Restrictions & Allergies",
-    restrictions: [
-      "Gluten-free",
-      "Dairy-free",
-      "Nut allergies",
-      "Shellfish allergies",
-      "Low sodium",
-    ],
+    restrictionsPlaceholder:
+      "Enter any allergies, dietary restrictions, or specific nutrition requirements. Leave empty if none.",
+    restrictionsHelp:
+      "Enter any allergies, dietary restrictions, or specific nutrition requirements. Leave empty if none.",
     submit: "Generate My Meal Plan",
     loading: "Your recipes are on the way...",
     requiredError: "Please fill in all required fields",
@@ -92,6 +109,19 @@ const en: I18n = {
     generatingTitle: "Generating Your Meal Plan...",
     generatingSub: "AI is crafting your personalized nutrition plan",
     tokensUsed: "tokens used",
+  },
+  fridge: {
+    title: "What's in Your Fridge?",
+    instructions: "Please add groceries that you have in your fridge.",
+    addItem: "Add Groceries Item",
+    emptyTitle: "Your fridge is empty",
+    emptyDesc: "Start adding groceries to track what you have at home",
+    name: "Item Name",
+    namePlaceholder: "e.g., Milk, Carrots, Bread",
+    quantity: "Quantity",
+    unit: "Unit",
+    cancel: "Cancel",
+    add: "Add Item",
   },
 };
 
@@ -111,15 +141,21 @@ const de: I18n = {
     languageGerman: "Deutsch",
   },
   form: {
-    plan: "Plan",
-    planPlaceholder: "Wähle deinen Plan",
+    plan: "Mahlzeitenplan-Typ",
+    planPlaceholder: "Wähle deinen Mahlzeitenplan-Typ",
     planOptions: ["1 Gericht", "Tagesplan"],
     dietType: "Ernährungsform",
-    dietTypePlaceholder: "Ernährungsform wählen",
+    dietTypePlaceholder: "Wähle deine Ernährungspräferenz",
     dietTypeOptions: ["Vegan", "Vegetarisch", "Normal"],
-    nutritional: "Nährwert",
-    nutritionalPlaceholder: "Nährwert wählen",
-    nutritionalOptions: ["Viele Nährstoffe", "Weniger Nährstoffe"],
+    goal: "Gesundheitsziel",
+    goalPlaceholder: "Wähle dein Gesundheitsziel",
+    goalOptions: [
+      "Gewichtsverlust",
+      "Gewichtszunahme",
+      "Muskelaufbau",
+      "Allgemeine Gesundheit",
+      "Sportliche Leistung",
+    ],
     mealType: "Mahlzeitentyp",
     mealTypePlaceholder: "Mahlzeit wählen",
     mealTypeOptions: ["Frühstück", "Mittagessen", "Abendessen"],
@@ -127,13 +163,10 @@ const de: I18n = {
     quickRecipes: "Schnelle Rezepte",
     quickRecipesSub: "20 Minuten oder weniger",
     restrictionsTitle: "Ernährungseinschränkungen & Allergien",
-    restrictions: [
-      "Glutenfrei",
-      "Laktosefrei",
-      "Nussallergien",
-      "Schalentierallergien",
-      "Wenig Natrium",
-    ],
+    restrictionsPlaceholder:
+      "z.B. glutenfrei, laktosefrei, Nussallergien oder spezifische Nährstoffanforderungen wie '200g Protein pro Tag'",
+    restrictionsHelp:
+      "Gib alle Allergien, Ernährungseinschränkungen oder spezifischen Nährstoffanforderungen ein. Leer lassen, wenn keine vorhanden.",
     submit: "Meinen Ernährungsplan erstellen",
     loading: "Deine Rezepte sind unterwegs...",
     requiredError: "Bitte fülle alle Pflichtfelder aus",
@@ -143,6 +176,21 @@ const de: I18n = {
     generatingTitle: "Erstelle deinen Ernährungsplan...",
     generatingSub: "Die KI erstellt deinen persönlichen Ernährungsplan",
     tokensUsed: "Tokens verwendet",
+  },
+  fridge: {
+    title: "Was ist in deinem Kühlschrank?",
+    instructions:
+      "Bitte füge Lebensmittel hinzu, die du in deinem Kühlschrank hast.",
+    addItem: "Lebensmittel hinzufügen",
+    emptyTitle: "Dein Kühlschrank ist leer",
+    emptyDesc:
+      "Beginne damit, Lebensmittel hinzuzufügen, um zu verfolgen, was du zu Hause hast",
+    name: "Artikelname",
+    namePlaceholder: "z.B. Milch, Karotten, Brot",
+    quantity: "Menge",
+    unit: "Einheit",
+    cancel: "Abbrechen",
+    add: "Artikel hinzufügen",
   },
 };
 

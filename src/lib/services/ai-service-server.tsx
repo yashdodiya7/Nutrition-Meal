@@ -1,17 +1,27 @@
 import Together from "together-ai";
+import { FridgeService } from "./fridge-service";
 
 const together = new Together({
   apiKey: process.env.TOGETHER_API_KEY, // Server-side only, no NEXT_PUBLIC prefix
 });
+
+export interface FridgeItem {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  category: "essential" | "fresh";
+}
 
 export interface MealPlanRequest {
   dietaryPreference: string;
   activityLevel: string;
   goal: string;
   mealFrequency: string;
-  restrictions: string[];
+  customRestrictions: string;
   quickRecipe: boolean;
   language?: "en" | "de";
+  fridgeItems?: FridgeItem[];
 }
 
 export interface MealPlanResponse {
@@ -42,7 +52,7 @@ export interface NutritionalInfo {
 }
 
 export class AIService {
-  private static readonly SYSTEM_PROMPT = `You are a professional nutritionist and meal planning expert in Germany. Your task is to create personalized German dishes meal plans based on user preferences and dietary requirements.
+  private static readonly SYSTEM_PROMPT = `You are a professional nutritionist and meal planning expert in Germany. Your task is to create personalized German dishes meal plans based on user preferences, dietary requirements, and available ingredients from their fridge.
 
 Guidelines:
 - Always provide practical, realistic meal suggestions for german dishes which is regularly used in german kitchen
@@ -51,17 +61,23 @@ Guidelines:
 - Be encouraging and supportive in your tone
 - Format your response in a clear, easy-to-read structure
 - Include estimated cooking times for every dish
+- **CRITICAL**: When fridge ingredients are provided, prioritize using those ingredients in your recipes
+- Only suggest additional ingredients that are commonly available and complement the fridge ingredients
+- Create recipes that maximize the use of available fridge ingredients
 
 Rules:
 - Always stick to the guidelines and rules never provide any other information than the response format
 - Always return the output strictly inside a single <dishes> tag, containing multiple dishes, where each dish must have the following elements in order: <dish_name>,<dish_ingredients>, <dish_instructions>, <dish_nutritional_information> (with <protine>, <carbs>, <fat>, <calories>), and <dish_estimated_cooking_time>. Repeat this sequence for each dish without adding any extra text or formatting outside the <dishes> tag.
 - The entire response (instead of tag names as per the format) must be written in the website language sent by the client (language: 'en' for English, 'de' for German). Do not include translations to other languages.
 - Always give <dish_ingredients> seperated by comma only.
+- Always give <dish_instructions> in a step by step manner with descriptive proper more informational steps, include all the details and process every bit of information well to prepare meal well.
+- Always Provide Quantity of the ingredients that are needed to cook food never skip this and provide regardless of any language it should be there in every dish.
+- **FRIDGE INTEGRATION**: When fridge ingredients are provided, start each recipe with the available ingredients and add minimal additional ingredients as needed.
 
 Response Format:
 <dishes>
 <dish_name>Name of the Dish</dish_name>
-<dish_ingredients>Ingredients of the Dish</dish_ingredients>
+<dish_ingredients>Ingredients of the Dish (prioritize fridge ingredients)</dish_ingredients>
 <dish_instructions>Instructions for cooking the Dish</dish_instructions>
 <dish_nutritional_information>Nutritional information of the Dish in a table format</dish_nutritional_information> // like <protine>10g</protine> <carbs>10g</carbs> <fat>10g</fat> <calories>100kcal</calories>
 <dish_estimated_cooking_time>Estimated cooking time for the Dish</dish_estimated_cooking_time>
@@ -73,16 +89,37 @@ Respond in a helpful, professional manner with actionable meal planning advice.`
     request: MealPlanRequest
   ): Promise<MealPlanResponse> {
     try {
-      const userMessage = this.buildUserMessage(request);
+      // Get fridge items from database if not provided in request
+      let fridgeItems = request.fridgeItems;
+      if (!fridgeItems || fridgeItems.length === 0) {
+        try {
+          const dbItems = await FridgeService.getFridgeItemsForMealPlan();
+          fridgeItems = dbItems.map((item) => ({
+            ...item,
+            category: item.category as "essential" | "fresh",
+          }));
+        } catch (error) {
+          console.log("No authenticated user or fridge items found");
+          fridgeItems = [];
+        }
+      }
+
+      // Create request with fridge items
+      const requestWithFridge = {
+        ...request,
+        fridgeItems,
+      };
+
+      const userMessage = this.buildUserMessage(requestWithFridge);
 
       const response = await together.chat.completions.create({
         messages: [
           { role: "system", content: this.SYSTEM_PROMPT },
           { role: "user", content: userMessage },
         ],
-        model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+        model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
         stream: false,
-        temperature: 0.7,
+        temperature: 0.5,
       });
 
       const choice = response.choices[0];
@@ -115,7 +152,7 @@ Respond in a helpful, professional manner with actionable meal planning advice.`
       `- Website language: ${request.language === "de" ? "de" : "en"}`,
       `- Plan Type: ${request.dietaryPreference}`,
       `- Diet Type: ${request.activityLevel}`,
-      `- Nutritional Value: ${request.goal}`,
+      `- Health Goal: ${request.goal}`,
     ];
 
     if (request.dietaryPreference === "1 Dish" && request.mealFrequency) {
@@ -126,8 +163,23 @@ Respond in a helpful, professional manner with actionable meal planning advice.`
       parts.push(`- Quick Recipes: Yes (20 minutes or less)`);
     }
 
-    if (request.restrictions.length > 0) {
-      parts.push(`- Dietary Restrictions: ${request.restrictions.join(", ")}`);
+    if (request.customRestrictions && request.customRestrictions.trim()) {
+      parts.push(
+        `- Dietary Restrictions & Requirements: ${request.customRestrictions.trim()}`
+      );
+    }
+
+    // Add fridge ingredients if available
+    if (request.fridgeItems && request.fridgeItems.length > 0) {
+      parts.push(`\n**AVAILABLE INGREDIENTS IN FRIDGE:**`);
+      request.fridgeItems.forEach((item) => {
+        parts.push(
+          `- ${item.name}: ${item.quantity} ${item.unit} (${item.category})`
+        );
+      });
+      parts.push(
+        `\n**IMPORTANT**: Please create recipes that primarily use these available ingredients. Only suggest additional ingredients that are commonly available and complement the fridge ingredients.`
+      );
     }
 
     parts.push(

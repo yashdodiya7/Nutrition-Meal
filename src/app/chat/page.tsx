@@ -14,7 +14,7 @@ const FormSection = () => {
     activityLevel: "",
     goal: "",
     mealFrequency: "",
-    restrictions: [],
+    customRestrictions: "",
     quickRecipe: false,
   });
 
@@ -26,6 +26,29 @@ const FormSection = () => {
   const { language } = useLanguage();
   const i18n = getI18n(language);
   const hasResults = isLoading || Boolean(aiResponse);
+
+  // Check if fridge items are available
+  const [hasFridgeItems, setHasFridgeItems] = useState(false);
+
+  useEffect(() => {
+    const checkFridgeItems = async () => {
+      try {
+        const response = await fetch("/api/fridge");
+        if (response.ok) {
+          const data = await response.json();
+          setHasFridgeItems(data.items.length > 0);
+        } else {
+          // Don't show error for fridge check, just assume no items
+          setHasFridgeItems(false);
+        }
+      } catch (error) {
+        // Silently fail for fridge check
+        setHasFridgeItems(false);
+      }
+    };
+
+    checkFridgeItems();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -61,12 +84,10 @@ const FormSection = () => {
     setOpenDropdown(null);
   };
 
-  const handleCheckboxChange = (restriction: string) => {
+  const handleCustomRestrictionsChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      restrictions: prev.restrictions.includes(restriction)
-        ? prev.restrictions.filter((r) => r !== restriction)
-        : [...prev.restrictions, restriction],
+      customRestrictions: value,
     }));
   };
 
@@ -80,15 +101,14 @@ const FormSection = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
-    if (
-      !formData.dietaryPreference ||
-      !formData.activityLevel ||
-      !formData.goal
-    ) {
-      setError(i18n.form.requiredError);
-      return;
-    }
+    // Set default values if not selected
+    const submitData = {
+      ...formData,
+      dietaryPreference: formData.dietaryPreference || "1 Day Plan",
+      activityLevel: formData.activityLevel || "Normal",
+      goal: formData.goal || "General Health",
+      language,
+    };
 
     setIsLoading(true);
     setError(null);
@@ -96,14 +116,19 @@ const FormSection = () => {
 
     try {
       const response = await AIService.generateMealPlan({
-        ...formData,
-        language,
+        ...submitData,
+        // Fridge items will be automatically fetched from database by the AI service
       });
       setAiResponse(response);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unexpected error occurred"
-      );
+      console.error("Meal plan generation error:", err);
+
+      // Set user-friendly error message
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -240,7 +265,7 @@ const FormSection = () => {
       className={`bg-gradient-to-t bg-green-50 from-gray-50 via-white to-green-50/30 ${
         hasResults
           ? "py-8 min-h-[calc(100dvh-80px)]"
-          : "min-h-[calc(100dvh-80px)] lg:pt-32"
+          : "min-h-[calc(100dvh-80px)] lg:pt-12"
       }`}
     >
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -294,11 +319,11 @@ const FormSection = () => {
 
             <div className="flex-1 min-w-[200px]">
               <EnhancedDropdown
-                label={i18n.form.nutritional}
+                label={i18n.form.goal}
                 value={formData.goal}
-                options={i18n.form.nutritionalOptions}
+                options={i18n.form.goalOptions}
                 onChange={(value) => handleDropdownChange("goal", value)}
-                placeholder={i18n.form.nutritionalPlaceholder}
+                placeholder={i18n.form.goalPlaceholder}
                 field="goal"
               />
             </div>
@@ -339,30 +364,33 @@ const FormSection = () => {
             </div>
           </div>
 
-          {/* Checkbox Section */}
+          {/* Custom Restrictions Input */}
           <div className="mb-4">
             <label className="block text-xs font-semibold text-gray-800 mb-3">
               {i18n.form.restrictionsTitle}
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-              {i18n.form.restrictions.map((restriction) => (
-                <label
-                  key={restriction}
-                  className="flex items-center p-3 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 cursor-pointer group"
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.restrictions.includes(restriction)}
-                    onChange={() => handleCheckboxChange(restriction)}
-                    className="w-4 h-4 text-green-500 border border-gray-300 rounded focus:ring-green-500 focus:ring-1"
-                  />
-                  <span className="ml-2 text-xs text-gray-700 font-medium group-hover:text-gray-900 transition-colors duration-300">
-                    {restriction}
-                  </span>
-                </label>
-              ))}
+            <div className="space-y-2">
+              <textarea
+                value={formData.customRestrictions}
+                onChange={(e) => handleCustomRestrictionsChange(e.target.value)}
+                placeholder={i18n.form.restrictionsPlaceholder}
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white text-gray-900 placeholder-gray-500 transition-colors resize-none placeholder:text-sm"
+                rows={1}
+              />
             </div>
           </div>
+
+          {/* Fridge Items Indicator */}
+          {hasFridgeItems && (
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-sm text-blue-700 font-medium">
+                  🧊 Your fridge ingredients will be used in the recipes
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Submit Button */}
           <div className="text-center">
