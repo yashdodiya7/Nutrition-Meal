@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { HeaderNav } from "@/components/HeaderNav";
+import { UserSyncProvider } from "@/components/UserSyncProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,10 +22,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className} suppressHydrationWarning={true}>
-          <LanguageProvider>
-            <HeaderNav />
-            {children}
-          </LanguageProvider>
+          <UserSyncProvider>
+            <LanguageProvider>
+              <HeaderNav />
+              {children}
+            </LanguageProvider>
+          </UserSyncProvider>
         </body>
       </html>
     </ClerkProvider>

@@ -29,7 +29,11 @@ export class FridgeService {
    * Add new fridge item
    */
   static async addFridgeItem(data: FridgeItemData) {
-    const user = await UserService.getOrCreateUser();
+    const user = await UserService.getCurrentUser();
+
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
 
     return await prisma.fridgeItem.create({
       data: {
