@@ -94,7 +94,7 @@ Respond in a helpful, professional manner with actionable meal planning advice.`
       if (!fridgeItems || fridgeItems.length === 0) {
         try {
           const dbItems = await FridgeService.getFridgeItemsForMealPlan();
-          fridgeItems = dbItems.map((item) => ({
+          fridgeItems = dbItems.map((item: FridgeItem) => ({
             ...item,
             category: item.category as "essential" | "fresh",
           }));
