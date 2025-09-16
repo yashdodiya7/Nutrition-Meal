@@ -13,6 +13,14 @@ export interface FridgeItem {
   category: "essential" | "fresh";
 }
 
+export interface FridgeItemFromDB {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  category: string;
+}
+
 export interface MealPlanRequest {
   dietaryPreference: string;
   activityLevel: string;
@@ -94,10 +102,15 @@ Respond in a helpful, professional manner with actionable meal planning advice.`
       if (!fridgeItems || fridgeItems.length === 0) {
         try {
           const dbItems = await FridgeService.getFridgeItemsForMealPlan();
-          fridgeItems = dbItems.map((item: any) => ({
-            ...item,
-            category: item.category as "essential" | "fresh",
-          }));
+          fridgeItems = dbItems.map(
+            (item: FridgeItemFromDB): FridgeItem => ({
+              id: item.id,
+              name: item.name,
+              quantity: item.quantity,
+              unit: item.unit,
+              category: item.category as "essential" | "fresh",
+            })
+          );
         } catch (error) {
           console.log("No authenticated user or fridge items found");
           fridgeItems = [];
