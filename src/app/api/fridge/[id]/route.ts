@@ -4,14 +4,15 @@ import { FridgeService } from "@/lib/services/fridge-service";
 // PUT - Update fridge item
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { name, quantity, unit, category } = body;
 
     // Validate ID parameter
-    if (!params.id) {
+    if (!id) {
       return NextResponse.json(
         { error: "Item ID is required" },
         { status: 400 }
@@ -37,7 +38,7 @@ export async function PUT(
       );
     }
 
-    const item = await FridgeService.updateFridgeItem(params.id, {
+    const item = await FridgeService.updateFridgeItem(id, {
       name: name ? name.trim() : undefined,
       quantity: quantity ? parseFloat(quantity) : undefined,
       unit,
@@ -77,18 +78,19 @@ export async function PUT(
 // DELETE - Delete fridge item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Validate ID parameter
-    if (!params.id) {
+    if (!id) {
       return NextResponse.json(
         { error: "Item ID is required" },
         { status: 400 }
       );
     }
 
-    await FridgeService.deleteFridgeItem(params.id);
+    await FridgeService.deleteFridgeItem(id);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting fridge item:", error);
