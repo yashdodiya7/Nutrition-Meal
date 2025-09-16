@@ -100,7 +100,15 @@ export class FridgeService {
   /**
    * Get fridge items for meal plan generation
    */
-  static async getFridgeItemsForMealPlan() {
+  static async getFridgeItemsForMealPlan(): Promise<
+    {
+      id: string;
+      name: string;
+      quantity: number;
+      unit: string;
+      category: string;
+    }[]
+  > {
     const user = await UserService.getCurrentUser();
 
     if (!user) {
