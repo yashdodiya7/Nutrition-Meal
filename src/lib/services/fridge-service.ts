@@ -15,8 +15,6 @@ export class FridgeService {
   static async getFridgeItems() {
     const user = await UserService.getCurrentUser();
 
-    console.log("user from getFridgeItems:", user);
-
     if (!user) {
       throw new Error("User not authenticated");
     }
@@ -32,8 +30,6 @@ export class FridgeService {
    */
   static async addFridgeItem(data: FridgeItemData) {
     const user = await UserService.getOrCreateUser();
-
-    console.log("user", user);
 
     return await prisma.fridgeItem.create({
       data: {
