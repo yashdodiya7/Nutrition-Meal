@@ -1,10 +1,20 @@
+export interface FridgeItem {
+  id: string;
+  name: string;
+  quantity: number;
+  unit: string;
+  category: "essential" | "fresh";
+}
+
 export interface MealPlanRequest {
   dietaryPreference: string;
   activityLevel: string;
   goal: string;
   mealFrequency: string;
-  restrictions: string[];
+  customRestrictions: string;
   quickRecipe: boolean;
+  language?: "en" | "de";
+  fridgeItems?: FridgeItem[];
 }
 
 export interface MealPlanResponse {
